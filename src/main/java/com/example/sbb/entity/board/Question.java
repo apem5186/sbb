@@ -1,6 +1,7 @@
 package com.example.sbb.entity.board;
 
 import com.example.sbb.entity.BaseEntity;
+import com.example.sbb.entity.user.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,9 @@ public class Question extends BaseEntity {
 
     @Column(columnDefinition = "TEXT") // columnDefinition = "TEXT"는 글자수를 제한할 수 없는 경우에 사용
     private String content;
+
+    @ManyToOne
+    private SiteUser author;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     private List<Answer> answerList;

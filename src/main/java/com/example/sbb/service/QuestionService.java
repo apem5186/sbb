@@ -1,6 +1,7 @@
 package com.example.sbb.service;
 
 import com.example.sbb.entity.board.Question;
+import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.exception.DataNotFoundException;
 import com.example.sbb.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +37,21 @@ public class QuestionService {
         }
     }
 
-    public void create(String subject, String content) {
+    public void create(String subject, String content, SiteUser user) {
         Question q = new Question();
         q.setContent(content);
         q.setSubject(subject);
+        q.setAuthor(user);
         this.questionRepository.save(q);
+    }
+
+    public void modify(Question question, String subject, String content) {
+        question.setContent(content);
+        question.setSubject(subject);
+        this.questionRepository.save(question);
+    }
+
+    public void delete(Question question) {
+        this.questionRepository.delete(question);
     }
 }
