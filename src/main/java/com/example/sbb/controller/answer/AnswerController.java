@@ -34,18 +34,6 @@ public class AnswerController {
     private final QuestionService questionService;
     private final UserService userService;
 
-//    @GetMapping
-//    public String list(Model model, @RequestParam(value = "page", defaultValue = "1") int page,
-//                       HttpServletRequest request) {
-//        String parameter = request.getRequestURI();
-//        log.info("==================================");
-//        log.info("parameter : " + parameter);
-//        log.info("==================================");
-//        Page<Answer> paging = this.answerService.getList(page);
-//        model.addAttribute("paging", paging);
-//        return "question_detail";
-//    }
-
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create/{id}")
     public String createAnswer(Model model, @PathVariable("id") Integer id,

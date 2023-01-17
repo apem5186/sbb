@@ -86,7 +86,7 @@
     <div th:if="${!paging.isEmpty()}">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
-                <a class="page-link" th:href="@{|?page=${1}|}"> <!--  th:href="@{|?page=${1}|}" -->
+                <a class="page-link" th:href="@{|?page=${1}|}">
                     <span>처음</span>
                 </a>
             </li>
@@ -95,7 +95,7 @@
                     <span>이전</span>
                 </a>
             </li>
-            <li th:if="${paging.getNumber() >= 4}" class="page-item">           <!--  th:href="@{|?page=${1}|}" -->
+            <li th:if="${paging.getNumber() >= 4}" class="page-item">
                 <a th:text="${1}" class="page-link" th:href="@{|?page=${1}|}"></a>
             </li>
             <li th:if="${paging.getNumber() >= 5}" class="page-item disabled">
@@ -103,21 +103,21 @@
             </li>
             <li th:each="page: ${#numbers.sequence(1, paging.totalPages)}"
                 th:if="${page >= paging.number - 2 and page <= paging.number + 4}"
-                th:classappend="${page - 1 == paging.number} ? 'active'" class="page-item"> <!--  th:href="@{|?page=${page}|} -->
+                th:classappend="${page - 1 == paging.number} ? 'disabled'" class="page-item">
                 <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
             </li>
             <li th:if="${paging.totalPages - paging.getNumber() >= 6}" class="page-item disabled">
                 <a class="page-link" tabindex="-1" aria-disabled="true">...</a>
             </li>
-            <li th:if="${paging.totalPages - paging.getNumber() >= 5}" class="page-item">   <!--  th:href="@{|?page=${paging.totalPages}|} -->
+            <li th:if="${paging.totalPages - paging.getNumber() >= 5}" class="page-item">
                 <a th:text="${paging.totalPages}" class="page-link" th:href="@{|?page=${paging.totalPages}|}"></a>
             </li>
-            <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">   <!--  th:href="@{|?page=${paging.number + 2}|} -->
+            <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">
                 <a class="page-link" th:href="@{|?page=${paging.number + 2}|}">
                     <span>다음</span>
                 </a>
             </li>
-            <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">   <!--  th:href="@{|?page=${paging.totalPages}|} -->
+            <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">
                 <a class="page-link" th:href="@{|?page=${paging.totalPages}|}">
                     <span>마지막</span>
                 </a>

@@ -55,7 +55,7 @@
                 </li>
                 <li th:each="page: ${#numbers.sequence(1, paging.totalPages)}"
                 th:if="${page >= paging.number - 2 and page <= paging.number + 4}"
-                th:classappend="${page - 1 == paging.number} ? 'active'" class="page-item"> <!--  th:href="@{|?page=${page}|} -->
+                th:classappend="${page - 1 == paging.number} ? 'disabled'" class="page-item"> <!--  th:href="@{|?page=${page}|} -->
                     <a th:text="${page}" class="page-link" href="javascript:void(0)" th:data-page="${page}"></a>
                 </li>
                 <li th:if="${paging.totalPages - paging.getNumber() >= 6}" class="page-item disabled">
