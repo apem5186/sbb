@@ -4,7 +4,7 @@
     <h2 class="border-bottom py-2" th:text="${question.subject}"></h2>
     <div class="card my-3">
         <div class="card-body">
-            <div class="card-text" style="white-space: pre-line;" th:text="${question.content}"></div>
+            <div class="card-text" th:utext="${@commonUtil.markdown(question.content)}"></div>
             <div class="d-flex justify-content-end">
                 <div th:if="${question.modDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
                     <div class="mb-2">modified at</div>
@@ -18,6 +18,11 @@
                 </div>
             </div>
             <div class="my-3">
+                <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+                   th:data-uri="@{|/question/vote/${question.id}|}">
+                    추천
+                    <span class="badge rounded-pill bg-success" th:text="${#lists.size(question.voter)}"></span>
+                </a>
                 <a th:href="@{|/question/modify/${question.id}|}" class="btn btn-sm btn-outline-secondary"
                 sec:authorize="isAuthenticated()"
                 th:if="${question.author != null and
@@ -36,9 +41,10 @@
     <h5 class="border-bottom my-3 py-2"
         th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
     <!-- 답변 반복 시작 -->
-    <div class="card my-3" th:each="answer : ${question.answerList}">
+    <div class="card my-3" th:each="answer, loop : ${paging}">
+        <a th:id="|answer_${answer.id}|"></a>
         <div class="card-body">
-            <div class="card-text" style="white-space: pre-line;" th:text="${answer.content}"></div>
+            <div class="card-text" th:utext="${@commonUtil.markdown(answer.content)}"></div>
             <div class="d-flex justify-content-end">
                 <div th:if="${answer.modDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
                     <div class="mb-2">modified at</div>
@@ -52,6 +58,11 @@
                 </div>
             </div>
             <div class="my-3">
+                <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+                   th:data-uri="@{|/answer/vote/${answer.id}|}">
+                    추천
+                    <span class="badge rounded-pill bg-success" th:text="${#lists.size(answer.voter)}"></span>
+                </a>
                 <a th:href="@{|/answer/modify/${answer.id}|}" class="btn btn-sm btn-outline-secondary"
                    sec:authorize="isAuthenticated()"
                    th:if="${answer.author != null and #authentication.getPrincipal().getUsername()
@@ -71,6 +82,49 @@
         <textarea sec:authorize="isAuthenticated()" th:field="*{content}" name="content" id="content" rows="10" class="form-control"></textarea>
         <input type="submit" value="답변등록" class="btn btn-primary my-2">
     </form>
+    <!-- 페이징 처리 시작 -->
+    <div th:if="${!paging.isEmpty()}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
+                <a class="page-link" th:href="@{|?page=${1}|}"> <!--  th:href="@{|?page=${1}|}" -->
+                    <span>처음</span>
+                </a>
+            </li>
+            <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
+                <a class="page-link" th:href="${paging.number}">
+                    <span>이전</span>
+                </a>
+            </li>
+            <li th:if="${paging.getNumber() >= 4}" class="page-item">           <!--  th:href="@{|?page=${1}|}" -->
+                <a th:text="${1}" class="page-link" th:href="@{|?page=${1}|}"></a>
+            </li>
+            <li th:if="${paging.getNumber() >= 5}" class="page-item disabled">
+                <a class="page-link" tabindex="-1" aria-disabled="true">...</a>
+            </li>
+            <li th:each="page: ${#numbers.sequence(1, paging.totalPages)}"
+                th:if="${page >= paging.number - 2 and page <= paging.number + 4}"
+                th:classappend="${page - 1 == paging.number} ? 'active'" class="page-item"> <!--  th:href="@{|?page=${page}|} -->
+                <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
+            </li>
+            <li th:if="${paging.totalPages - paging.getNumber() >= 6}" class="page-item disabled">
+                <a class="page-link" tabindex="-1" aria-disabled="true">...</a>
+            </li>
+            <li th:if="${paging.totalPages - paging.getNumber() >= 5}" class="page-item">   <!--  th:href="@{|?page=${paging.totalPages}|} -->
+                <a th:text="${paging.totalPages}" class="page-link" th:href="@{|?page=${paging.totalPages}|}"></a>
+            </li>
+            <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">   <!--  th:href="@{|?page=${paging.number + 2}|} -->
+                <a class="page-link" th:href="@{|?page=${paging.number + 2}|}">
+                    <span>다음</span>
+                </a>
+            </li>
+            <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">   <!--  th:href="@{|?page=${paging.totalPages}|} -->
+                <a class="page-link" th:href="@{|?page=${paging.totalPages}|}">
+                    <span>마지막</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- 페이징 처리 끝 -->
 </div>
 <script layout:fragment="script" type='text/javascript'>
     const delete_elements = document.getElementsByClassName("delete");
@@ -81,5 +135,13 @@
             };
         });
     });
+    const recommend_elements = document.getElementsByClassName("recommend");
+    Array.from(recommend_elements).forEach(function (element) {
+        element.addEventListener('click', function () {
+            if (confirm("정말로 추천하시겠습니까?")) {
+                location.href = this.dataset.uri;
+            }
+        })
+    })
 </script>
 </html>

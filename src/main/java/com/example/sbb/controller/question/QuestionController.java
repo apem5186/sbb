@@ -2,11 +2,14 @@ package com.example.sbb.controller.question;
 
 import com.example.sbb.dto.AnswerForm;
 import com.example.sbb.dto.QuestionForm;
+import com.example.sbb.entity.board.Answer;
 import com.example.sbb.entity.board.Question;
 import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.repository.QuestionRepository;
+import com.example.sbb.service.AnswerService;
 import com.example.sbb.service.QuestionService;
 import com.example.sbb.service.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,17 +31,23 @@ public class QuestionController {
 
     private final QuestionRepository questionRepository;
     private final QuestionService questionService;
+    private final AnswerService answerService;
     private final UserService userService;
 
     @GetMapping("/list")
-    public String list(Model model, @RequestParam(value = "page", defaultValue = "1") int page) {
-        Page<Question> paging = this.questionService.getList(page);
+    public String list(Model model, @RequestParam(value = "page", defaultValue = "1") int page,
+                       @RequestParam(value = "kw", defaultValue = "") String kw) {
+        Page<Question> paging = this.questionService.getList(page, kw);
         model.addAttribute("paging", paging);
+        model.addAttribute("kw", kw);
         return "question_list";
     }
     @GetMapping("/detail/{id}")
-    public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm) {
+    public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm,
+                         @RequestParam(value = "page", defaultValue = "1") int page) {
         Question question = this.questionService.getQuestion(id);
+        Page<Answer> paging = this.answerService.getList(page, id);
+        model.addAttribute("paging", paging);
         model.addAttribute("question", question);
         return "question_detail";
     }
@@ -97,5 +106,14 @@ public class QuestionController {
         }
         this.questionService.delete(question);
         return "redirect:/";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/vote/{id}")
+    public String questionVote(Principal principal, @PathVariable("id") Integer id) {
+        Question question = this.questionService.getQuestion(id);
+        SiteUser siteUser = this.userService.getUser(principal.getName());
+        this.questionService.vote(question, siteUser);
+        return String.format("redirect:/question/detail/%s", id);
     }
 }

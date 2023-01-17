@@ -5,6 +5,8 @@ import com.example.sbb.entity.user.SiteUser;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -22,4 +24,7 @@ public class Answer extends BaseEntity {
 
     @ManyToOne
     private Question question;
+
+    @ManyToMany
+    Set<SiteUser> voter;
 }

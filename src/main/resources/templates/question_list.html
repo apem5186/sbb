@@ -1,5 +1,16 @@
 <html layout:decorate="~{layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
     <div layout:fragment="content" class="container my-3">
+        <div class="row my-3">
+            <div class="col-6">
+                <a th:href="@{/question/create}" class="btn btn-primary">질문 등록하기</a>
+            </div>
+            <div class="col-6">
+                <div class="input-group">
+                    <input type="text" id="search_kw" class="form-control" th:value="${kw}">
+                    <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+                </div>
+            </div>
+        </div>
         <table class="table">
             <thead class="table-dark">
             <tr class="text-center">
@@ -27,45 +38,63 @@
         <div th:if="${!paging.isEmpty()}">
             <ul class="pagination justify-content-center">
                 <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
-                    <a class="page-link" th:href="@{|?page=${1}|}">
+                    <a class="page-link" href="javascript:void(0)" th:data-page="${1}"> <!--  th:href="@{|?page=${1}|}" -->
                         <span>처음</span>
                     </a>
                 </li>
                 <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
-                    <a class="page-link" th:href="@{|?page=${paging.number}|}">
+                    <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number}">
                         <span>이전</span>
                     </a>
                 </li>
-                <li th:if="${paging.getNumber() >= 4}" class="page-item">
-                    <a th:text="${1}" class="page-link" th:href="@{|?page=${1}|}"></a>
+                <li th:if="${paging.getNumber() >= 4}" class="page-item">           <!--  th:href="@{|?page=${1}|}" -->
+                    <a th:text="${1}" class="page-link" href="javascript:void(0)" th:data-page="${1}"></a>
                 </li>
                 <li th:if="${paging.getNumber() >= 5}" class="page-item disabled">
                     <a class="page-link" tabindex="-1" aria-disabled="true">...</a>
                 </li>
                 <li th:each="page: ${#numbers.sequence(1, paging.totalPages)}"
                 th:if="${page >= paging.number - 2 and page <= paging.number + 4}"
-                th:classappend="${page - 1 == paging.number} ? 'active'" class="page-item">
-                    <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
+                th:classappend="${page - 1 == paging.number} ? 'active'" class="page-item"> <!--  th:href="@{|?page=${page}|} -->
+                    <a th:text="${page}" class="page-link" href="javascript:void(0)" th:data-page="${page}"></a>
                 </li>
                 <li th:if="${paging.totalPages - paging.getNumber() >= 6}" class="page-item disabled">
                     <a class="page-link" tabindex="-1" aria-disabled="true">...</a>
                 </li>
-                <li th:if="${paging.totalPages - paging.getNumber() >= 5}" class="page-item">
-                    <a th:text="${paging.totalPages}" class="page-link" th:href="@{|?page=${paging.totalPages}|}"></a>
+                <li th:if="${paging.totalPages - paging.getNumber() >= 5}" class="page-item">   <!--  th:href="@{|?page=${paging.totalPages}|} -->
+                    <a th:text="${paging.totalPages}" class="page-link" href="javascript:void(0)" th:data-page="${paging.totalPages}"></a>
                 </li>
-                <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">
-                    <a class="page-link" th:href="@{|?page=${paging.number + 2}|}">
+                <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">   <!--  th:href="@{|?page=${paging.number + 2}|} -->
+                    <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number + 2}">
                         <span>다음</span>
                     </a>
                 </li>
-                <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">
-                    <a class="page-link" th:href="@{|?page=${paging.totalPages}|}">
+                <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">   <!--  th:href="@{|?page=${paging.totalPages}|} -->
+                    <a class="page-link" href="javascript:void(0)" th:data-page="${paging.totalPages}">
                         <span>마지막</span>
                     </a>
                 </li>
             </ul>
         </div>
         <!-- 페이징 처리 끝 -->
-        <a th:href="@{/question/create}" class="btn btn-primary">질문 등록하기</a>
+        <form th:action="@{/question/list}" method="get" id="searchForm">
+            <input type="hidden" id="kw" name="kw" th:value="${kw}">
+            <input type="hidden" id="page" name="page" th:value="${paging.number}">
+        </form>
     </div>
+    <script layout:fragment="script" type='text/javascript'>
+        const page_elements = document.getElementsByClassName("page-link");
+        Array.from(page_elements).forEach(function(element) {
+            element.addEventListener('click', function() {
+                document.getElementById('page').value = this.dataset.page;
+                document.getElementById('searchForm').submit();
+            });
+        });
+        const btn_search = document.getElementById("btn_search");
+        btn_search.addEventListener('click', function() {
+            document.getElementById('kw').value = document.getElementById('search_kw').value;
+            document.getElementById('page').value = 1;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
+            document.getElementById('searchForm').submit();
+        });
+    </script>
 </html>
