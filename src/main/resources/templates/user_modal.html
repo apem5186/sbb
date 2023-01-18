@@ -1,0 +1,23 @@
+<!-- Modal -->
+<div th:fragment="modalFragment" class="modal fade" role="dialog" id="userModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <!-- Modal Content -->
+    <div class="modal-content">
+      <div class="modal-header">
+        Profile
+      </div>
+      <div class="modal-body">
+        <h5 class="fw-bold">Nickname</h5>
+        <h6 th:text="${#authentication.name}"></h6>
+        <hr class="h-25">
+        <h5></h5>
+        <h5 class="fw-bold">Email</h5>
+        <h6 th:text="${#authentication.principal}"></h6>
+        <hr class="h-25">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
