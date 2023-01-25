@@ -1,6 +1,7 @@
 package com.example.sbb.controller.question;
 
 import com.example.sbb.dto.AnswerForm;
+import com.example.sbb.dto.ProfileDTO;
 import com.example.sbb.dto.QuestionForm;
 import com.example.sbb.entity.board.Answer;
 import com.example.sbb.entity.board.Question;
@@ -9,7 +10,6 @@ import com.example.sbb.repository.QuestionRepository;
 import com.example.sbb.service.AnswerService;
 import com.example.sbb.service.QuestionService;
 import com.example.sbb.service.user.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -33,6 +32,8 @@ public class QuestionController {
     private final QuestionService questionService;
     private final AnswerService answerService;
     private final UserService userService;
+
+
 
     @GetMapping("/list")
     public String list(Model model, @RequestParam(value = "page", defaultValue = "1") int page,

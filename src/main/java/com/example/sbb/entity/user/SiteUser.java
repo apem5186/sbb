@@ -21,4 +21,10 @@ public class SiteUser extends BaseEntity {
 
     @Column(unique = true)
     private String email;
+
+    public void modify(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 }

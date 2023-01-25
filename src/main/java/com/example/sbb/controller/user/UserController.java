@@ -1,16 +1,21 @@
 package com.example.sbb.controller.user;
 
 import com.example.sbb.dto.UserCreateForm;
+import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.repository.UserRepository;
 import com.example.sbb.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.security.Principal;
 
 @RequiredArgsConstructor
 @Controller
@@ -51,6 +56,20 @@ public class UserController {
         }
 
         return "redirect:/";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/modify")
+    public void modify(UserCreateForm userCreateForm, BindingResult bindingResult, Principal principal) {
+        SiteUser siteUser = userRepository.findByUsername(principal.getName()).orElseThrow();
+
+        try {
+            userService.modify(userCreateForm.getUsername(), userCreateForm.getEmail(),
+                    userCreateForm.getPassword1(), siteUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+            bindingResult.reject("modifyFailed", e.getMessage());
+        }
     }
 
     @GetMapping("/login")
