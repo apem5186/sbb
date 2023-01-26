@@ -1,29 +1,38 @@
 package com.example.sbb.controller.user;
 
+import com.example.sbb.dto.ProfileDTO;
 import com.example.sbb.dto.UserCreateForm;
 import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.repository.UserRepository;
 import com.example.sbb.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.security.Principal;
 
 @RequiredArgsConstructor
 @Controller
+@Slf4j
 @RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
     private final UserRepository userRepository;
+
+    private final AuthenticationManager authenticationManager;
 
     @GetMapping("/signup")
     public String signup(UserCreateForm userCreateForm) {
@@ -59,17 +68,64 @@ public class UserController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/modify")
-    public void modify(UserCreateForm userCreateForm, BindingResult bindingResult, Principal principal) {
-        SiteUser siteUser = userRepository.findByUsername(principal.getName()).orElseThrow();
+    @GetMapping("/modify")
+    public String modify(UserCreateForm userCreateForm, Model model, Principal principal) {
+        SiteUser siteUser = userService.getUser(principal.getName());
+        ProfileDTO profileDTO = new ProfileDTO(siteUser);
+        model.addAttribute("profileDTO", profileDTO);
+        return "user_detail";
+    }
 
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/modify")
+    public String modify(@Valid UserCreateForm userCreateForm, BindingResult bindingResult, Principal principal,
+                         Model model) {
+        SiteUser siteUser = userRepository.findByUsername(principal.getName()).orElseThrow();
+        ProfileDTO profileDTO = new ProfileDTO(siteUser);
+        if (bindingResult.hasErrors()) {
+            log.info("SITE USER : " + siteUser.getEmail());
+            log.info("PROFILEDTO : " + profileDTO.getEmail());
+            model.addAttribute("profileDTO", profileDTO);
+            return "user_detail";
+        }
+
+        if (!userCreateForm.getPassword1().equals(userCreateForm.getPassword2())) {
+            bindingResult.rejectValue("password2", "passwordInCorrect",
+                    "2개의 패스워드가 일치하지 않습니다.");
+            model.addAttribute("profileDTO", profileDTO);
+            return "user_detail";
+        }
         try {
             userService.modify(userCreateForm.getUsername(), userCreateForm.getEmail(),
                     userCreateForm.getPassword1(), siteUser);
+            /* 변경된 세션 등록 */
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userCreateForm.getUsername(), userCreateForm.getPassword1()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (Exception e) {
             e.printStackTrace();
             bindingResult.reject("modifyFailed", e.getMessage());
         }
+
+        return "redirect:/user/modify";
+    }
+
+    @PostMapping("/duplCheck")
+    @ResponseBody
+    public String duplCheck(Principal principal, String username,
+                            String email) {
+        SiteUser siteUser = userService.getUser(principal.getName());
+        if (!email.equals(siteUser.getEmail())) {
+            if (userRepository.findByEmail(email).isPresent()) {
+                return "emailError";
+            }
+        }
+        if (!username.equals(siteUser.getUsername())) {
+            if (userRepository.findByUsername(username).isPresent()) {
+                return "usernameError";
+            }
+        }
+        return "ok";
     }
 
     @GetMapping("/login")

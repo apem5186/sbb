@@ -17,10 +17,9 @@
       </ul>
       <ul class="navbar-nav">
         <li class="nav-item">
-          <button type="button" id="userBtn" class="btn rounded" sec:authorize="isAuthenticated()"
-                  data-bs-toggle="modal" data-bs-target="#userModal">
+          <a th:href="@{/user/modify}" id="userBtn" class="btn rounded" sec:authorize="isAuthenticated()">
             <i class="bi bi-person-fill fs-3"></i>
-          </button>
+          </a>
         </li>
       </ul>
     </div>

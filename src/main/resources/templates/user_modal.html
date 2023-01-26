@@ -1,51 +1,51 @@
-<!-- Modal -->
-<div th:fragment="modalFragment" class="modal fade" role="dialog" id="userModal" tabindex="-1"
-     aria-hidden="true">
-  <div class="modal-dialog">
-    <!-- Modal Content -->
-    <div class="modal-content">
-      <div class="modal-header d-flex">
-        <span class="me-auto">Profile</span>
-        <button type="button" id="userModify" class="btn btn-outline-secondary fw-semibold"
-        onclick="userModify()">Modify</button>
-        <button type="button" id="userDelete" class="btn btn-outline-danger fw-semibold"
-                onclick="userDelete()">Delete</button>
-      </div>
-      <div class="modal-body">
-        <form name="userForm" id="userForm" onsubmit="return false" role="form">
-          <div class="mb-3">
-            <label for="username" class="form-label">사용자ID</label>
-            <input type="text" id="username" class="form-control" value="" disabled>
-          </div>
-          <div class="mb-3" id="password_1" style="display: none">
-            <label for="password1" class="form-label">비밀번호</label>
-            <input type="password" id="password1" class="form-control" value="">
-          </div>
-          <div class="mb-3" id="password_2" style="display: none">
-            <label for="password2" class="form-label">비밀번호 확인</label>
-            <input type="password" id="password2" class="form-control" value="">
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">이메일</label>
-            <input type="email" id="email" class="form-control" value="" disabled>
-          </div>
-          <button type="submit" class="btn btn-primary" id="formSubmit" style="display: none"
-          onclick="userModifySubmit()"
-          data-bs-username="username"
-          data-bs-password1="password1"
-          data-bs-password2="password2"
-          data-bs-email="email">Submit</button>
-        </form>
-      </div>
-      <div class="modal-footer d-flex">
-        <div class="me-auto">
-          <button type="button" class="btn btn-danger" id="formCancel" style="display: none"
-          onclick="userModifyCancel()">Cancel</button>
-        </div>
-        <div>
-          <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<!--&lt;!&ndash; Modal &ndash;&gt;-->
+<!--<div th:fragment="modalFragment" class="modal fade" role="dialog" id="userModal" tabindex="-1"-->
+<!--     aria-hidden="true">-->
+<!--  <div class="modal-dialog">-->
+<!--    &lt;!&ndash; Modal Content &ndash;&gt;-->
+<!--    <div class="modal-content">-->
+<!--      <div class="modal-header d-flex">-->
+<!--        <span class="me-auto">Profile</span>-->
+<!--        <button type="button" id="userModify" class="btn btn-outline-secondary fw-semibold"-->
+<!--        onclick="userModify()">Modify</button>-->
+<!--        <button type="button" id="userDelete" class="btn btn-outline-danger fw-semibold"-->
+<!--                onclick="userDelete()">Delete</button>-->
+<!--      </div>-->
+<!--      <div class="modal-body">-->
+<!--        <form name="userForm" id="userForm" onsubmit="return false" role="form">-->
+<!--          <div class="mb-3">-->
+<!--            <label for="username" class="form-label">사용자ID</label>-->
+<!--            <input type="text" id="username" class="form-control" value="" disabled>-->
+<!--          </div>-->
+<!--          <div class="mb-3" id="password_1" style="display: none">-->
+<!--            <label for="password1" class="form-label">비밀번호</label>-->
+<!--            <input type="password" id="password1" class="form-control" value="">-->
+<!--          </div>-->
+<!--          <div class="mb-3" id="password_2" style="display: none">-->
+<!--            <label for="password2" class="form-label">비밀번호 확인</label>-->
+<!--            <input type="password" id="password2" class="form-control" value="">-->
+<!--          </div>-->
+<!--          <div class="mb-3">-->
+<!--            <label for="email" class="form-label">이메일</label>-->
+<!--            <input type="email" id="email" class="form-control" value="" disabled>-->
+<!--          </div>-->
+<!--          <button type="submit" class="btn btn-primary" id="formSubmit" style="display: none"-->
+<!--          onclick="userModifySubmit()"-->
+<!--          data-bs-username="username"-->
+<!--          data-bs-password1="password1"-->
+<!--          data-bs-password2="password2"-->
+<!--          data-bs-email="email">Submit</button>-->
+<!--        </form>-->
+<!--      </div>-->
+<!--      <div class="modal-footer d-flex">-->
+<!--        <div class="me-auto">-->
+<!--          <button type="button" class="btn btn-danger" id="formCancel" style="display: none"-->
+<!--          onclick="userModifyCancel()">Cancel</button>-->
+<!--        </div>-->
+<!--        <div>-->
+<!--          <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->

@@ -1,20 +1,62 @@
 <html layout:decorate="~{layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
 <div layout:fragment="content" class="container my-3">
     <h5 class="my-3 border-bottom pb-2">Profile</h5>
-    <form th:action="@{/user/modify}" th:object="${userCreateForm}" method="post">
+    <button type="button" id="userModify" class="btn btn-outline-secondary fw-semibold"
+            onclick="userModify()">Modify</button>
+    <button type="button" id="userDelete" class="btn btn-outline-danger fw-semibold"
+            onclick="userDelete()">Delete</button>
+    <div class="card border-start border-3" style="background-color: white" id="user_card">
+        <div class="card-header">
+            <span class="mb-3">
+                Username
+            </span>
+            <div class="card-body border-start border-5" th:text="${profileDTO.username}"></div>
+        </div>
+        <div class="card-header">
+            <span class="mb-3">
+                Email
+            </span>
+            <div class="card-body border-start border-5" th:text="${profileDTO.email}"></div>
+        </div>
+        <div class="card-header">
+            <span class="mb-3">
+                RegDate
+            </span>
+            <div class="card-body border-start border-5" th:text="${profileDTO.regDate}"></div>
+        </div>
+        <div class="card-header">
+            <span class="mb-3">
+                ModDate
+            </span>
+            <div class="card-body border-start border-5" th:text="${profileDTO.modDate}"></div>
+        </div>
+    </div>
+    <form id="user_detail_form" th:action="@{/user/modify}" th:object="${userCreateForm}" method="post"
+    style="display: none">
         <div th:replace="~{form_errors :: formErrorsFragment}"></div>
         <div class="mb-3">
             <label for="username" class="form-label">사용자ID</label>
-            <input type="text" th:field="*{username}" class="form-control">
+            <input type="text" th:field="*{username}" class="form-control"
+            placeholder="변경할 사용자ID를 입력해주세요.">
         </div>
         <div class="mb-3">
             <label for="password1" class="form-label">비밀번호</label>
-            <input type="password" th:field="*{password1}" class="form-control">
+            <input type="password" th:field="*{password1}" class="form-control"
+            placeholder="변경할 비밀번호를 입력해주세요.">
         </div>
         <div class="mb-3">
             <label for="password2" class="form-label">비밀번호 확인</label>
-            <input type="password" th:field="*{password2}" class="form-control">
+            <input type="password" th:field="*{password2}" class="form-control"
+            placeholder="변경할 비밀번호를 다시 입력해주세요.">
         </div>
-
+        <div class="mb-3">
+            <label for="email" class="form-label">이메일</label>
+            <input type="email" th:field="*{email}" class="form-control"
+                   placeholder="변경할 이메일을 입력해주세요.">
+        </div>
+        <button type="submit" class="btn btn-primary" id="formSubmit" style="display: none"
+                onsubmit="return false">저장하기</button>
+        <button type="button" class="btn btn-danger" id="formCancel" style="display: none"
+                onclick="userModifyCancel()">Cancel</button>
     </form>
 </div>

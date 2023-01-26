@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootTest
 class SbbApplicationTests {
@@ -40,6 +41,9 @@ class SbbApplicationTests {
     @Autowired
     private AnswerRepository answerRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Test
     void testJpa() {
         for (int i = 1; i <= 300; i++) {
@@ -57,6 +61,15 @@ class SbbApplicationTests {
         for (int i = 1; i <= 100; i++) {
             this.answerService.create(question, "테스트 데이터_" + i, user02);
         }
+    }
+
+    @Test
+    void modifyUser() {
+        SiteUser user = userRepository.findByUsername("").orElseThrow();
+        SiteUser user01 = userService.modify("user01", "user01@test.com", "1111", user);
+        System.out.println("=================================");
+        System.out.println("USER01 : " + user01);
+        System.out.println("=================================");
     }
 
     @Test

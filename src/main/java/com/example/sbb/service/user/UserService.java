@@ -28,7 +28,8 @@ public class UserService {
 
     @Transactional
     public SiteUser modify(String username, String email, String password, SiteUser siteUser) {
-        siteUser.modify(username, email, password);
+        siteUser.modify(username, passwordEncoder.encode(password), email);
+        userRepository.save(siteUser);
         return siteUser;
     }
 
