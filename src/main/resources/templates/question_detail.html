@@ -8,13 +8,13 @@
             <div class="d-flex justify-content-end">
                 <div th:if="${question.modDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
                     <div class="mb-2">modified at</div>
-                    <div th:text="${#temporals.format(question.modDate, 'yyyy-MM-dd HH:mm')}"></div>
+                    <div th:text="${question.modDate}"></div>
                 </div>
                 <div class="badge bg-light text-dark p-2 text-start">
                     <div class="mb-2">
                         <span th:if="${question.author != null}" th:text="${question.author.username}"></span>
                     </div>
-                    <div th:text="${#temporals.format(question.regDate, 'yyyy-MM-dd HH:mm')}"></div>
+                    <div th:text="${question.regDate}"></div>
                 </div>
             </div>
             <div class="my-3">
@@ -48,13 +48,13 @@
             <div class="d-flex justify-content-end">
                 <div th:if="${answer.modDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
                     <div class="mb-2">modified at</div>
-                    <div th:text="${#temporals.format(answer.modDate, 'yyyy-MM-dd HH:mm')}"></div>
+                    <div th:text="${answer.modDate}"></div>
                 </div>
                 <div class="badge bg-light text-dark p-2 text-start">
                     <div class="mb-2">
                         <span th:if="${answer.author != null}" th:text="${answer.author.username}"></span>
                     </div>
-                    <div th:text="${#temporals.format(answer.regDate, 'yyyy-MM-dd HH:mm')}"></div>
+                    <div th:text="${answer.regDate}"></div>
                 </div>
             </div>
             <div class="my-3">

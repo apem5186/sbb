@@ -1,15 +1,14 @@
 package com.example.sbb.entity.user;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public enum UserRole {
     ADMIN("ROLE_ADMIN"),
-    USER("ROLE_USER");
+    USER("ROLE_USER"),
+    SOCIAL("ROLE_SOCIAL");  // OAUTH
 
-    UserRole(String value) {
-        this.value = value;
-    }
-
-    private String value;
+    private final String value;
 }

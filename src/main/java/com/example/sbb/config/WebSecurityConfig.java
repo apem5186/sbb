@@ -1,5 +1,6 @@
 package com.example.sbb.config;
 
+import com.example.sbb.service.user.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
+
+    /* OAuth */
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -48,8 +52,13 @@ public class WebSecurityConfig {
                 .and()
                 .logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
+                .invalidateHttpSession(true).deleteCookies("JSESSIONID")
                 .logoutSuccessUrl("/")
-                .invalidateHttpSession(true)
+                .and()  /* OAUTH */
+                .oauth2Login()
+                .userInfoEndpoint() // OAuth2 로그인 성공 후 가져올 설정들
+                .userService(customOAuth2UserService) // 서버에서 사용자 정보를 가져온 상태에서 추가로 진행하고자 하는 기능 명시
+                .and()
                 .and().build();
     }
 

@@ -15,9 +15,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.Principal;
 
 @Controller
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/question")
 public class QuestionController {
@@ -107,11 +112,26 @@ public class QuestionController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
     public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult,
-                                 Principal principal) {
+                                 Principal principal,
+                                 Authentication authentication) {
         if (bindingResult.hasErrors()) {
             return "question_form";
         }
-        SiteUser siteUser = this.userService.getUser(principal.getName());
+        log.info("99999999999999999999999999999999999999");
+        log.info("PRINCIPAL : " + authentication.getPrincipal());
+        log.info("PRINCIPAL : " + authentication.getName());
+        log.info("PRINCIPAL : " + authentication.getDetails());
+        log.info("PRINCIPAL : " + authentication.getAuthorities());
+        log.info("PRINCIPAL : " + authentication.getCredentials());
+        log.info("99999999999999999999999999999999999999");
+        // TODO : User user = (User) authentication.getPrincipal();
+        // TODO : user.getUsername() 하면 닉네임 가져올 수 있지만
+        // TODO : java.lang.ClassCastException: class org.springframework.security.oauth2.core.user.DefaultOAuth2User cannot be cast to class org.springframework.security.core.userdetails.User
+        // TODO : cast 에러 뜨면서 안됨 구글 쳐서 해결법 강구해야함
+        SiteUser siteUser = this.userService.getUser(user.getUsername());
+        log.info("================================");
+        log.info("SITE USER : " + siteUser.getUsername());
+        log.info("================================");
         this.questionService.create(questionForm.getSubject(), questionForm.getContent(), siteUser);
         return "redirect:/question/list";
     }

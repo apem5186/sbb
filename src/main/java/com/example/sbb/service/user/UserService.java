@@ -1,16 +1,19 @@
 package com.example.sbb.service.user;
 
 import com.example.sbb.entity.user.SiteUser;
+import com.example.sbb.entity.user.UserRole;
 import com.example.sbb.exception.DataNotFoundException;
 import com.example.sbb.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class UserService {
 
@@ -23,6 +26,7 @@ public class UserService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setRole(UserRole.USER);
         this.userRepository.save(user);
         return user;
     }
@@ -39,6 +43,9 @@ public class UserService {
         if (siteUser.isPresent()) {
             return siteUser.get();
         } else {
+            log.info("------------------------------");
+            log.info("USERNAME : " + username);
+            log.info("------------------------------");
             throw new DataNotFoundException("siteuser not found");
         }
     }

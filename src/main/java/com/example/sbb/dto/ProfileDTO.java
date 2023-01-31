@@ -16,9 +16,9 @@ public class ProfileDTO {
 
     private String email;
 
-    private LocalDateTime regDate;
+    private String regDate;
 
-    private LocalDateTime modDate;
+    private String modDate;
 
     public ProfileDTO(SiteUser siteUser) {
         this.id = siteUser.getId();
