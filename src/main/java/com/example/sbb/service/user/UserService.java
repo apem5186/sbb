@@ -17,6 +17,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public SiteUser create(String username, String email, String password) {
         SiteUser user = new SiteUser();
         user.setUsername(username);
@@ -40,5 +41,19 @@ public class UserService {
         } else {
             throw new DataNotFoundException("siteuser not found");
         }
+    }
+
+    public SiteUser getUserWithId(Long id) {
+        Optional<SiteUser> siteUser = this.userRepository.findById(id);
+        if (siteUser.isPresent()) {
+            return siteUser.get();
+        } else {
+            throw new DataNotFoundException("siteuser not found");
+        }
+    }
+
+    @Transactional
+    public void delete(SiteUser siteUser) {
+        this.userRepository.delete(siteUser);
     }
 }

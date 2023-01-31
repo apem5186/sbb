@@ -4,7 +4,6 @@ import com.example.sbb.dto.AnswerForm;
 import com.example.sbb.entity.board.Answer;
 import com.example.sbb.entity.board.Question;
 import com.example.sbb.entity.user.SiteUser;
-import com.example.sbb.repository.AnswerRepository;
 import com.example.sbb.service.AnswerService;
 import com.example.sbb.service.QuestionService;
 import com.example.sbb.service.user.UserService;
@@ -94,5 +93,11 @@ public class AnswerController {
         SiteUser siteUser = this.userService.getUser(principal.getName());
         this.answerService.vote(answer, siteUser);
         return String.format("redirect:/question/detail/%s", answer.getQuestion().getId());
+    }
+
+    @GetMapping("/getHigherVote/{id}")
+    public void getHigherVote(Model model, @PathVariable("id") Integer id) {
+        Answer answer = this.answerService.getHigherVoter(id);
+        model.addAttribute("HighVotedAnswer", answer);
     }
 }

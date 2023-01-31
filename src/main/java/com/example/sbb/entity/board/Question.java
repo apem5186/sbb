@@ -24,6 +24,9 @@ public class Question extends BaseEntity {
     @Column(columnDefinition = "TEXT") // columnDefinition = "TEXT"는 글자수를 제한할 수 없는 경우에 사용
     private String content;
 
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int hits;
+
     @ManyToOne
     private SiteUser author;
 

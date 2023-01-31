@@ -6,6 +6,7 @@ import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.exception.DataNotFoundException;
 import com.example.sbb.repository.QuestionRepository;
 import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -80,5 +81,10 @@ public class QuestionService {
                         cb.like(u2.get("username"), "%" + kw + "%"));  // 답변 작성자
             }
         };
+    }
+
+    @Transactional
+    public int updateHits(Integer id) {
+        return this.questionRepository.updateHits(id);
     }
 }

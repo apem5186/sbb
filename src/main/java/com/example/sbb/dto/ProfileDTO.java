@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 @Setter
 public class ProfileDTO {
 
+    private Long id;
+
     private String username;
 
     private String email;
@@ -19,6 +21,7 @@ public class ProfileDTO {
     private LocalDateTime modDate;
 
     public ProfileDTO(SiteUser siteUser) {
+        this.id = siteUser.getId();
         this.username = siteUser.getUsername();
         this.email = siteUser.getEmail();
         this.regDate = siteUser.getRegDate();

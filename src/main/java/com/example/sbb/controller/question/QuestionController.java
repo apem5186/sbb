@@ -10,6 +10,9 @@ import com.example.sbb.repository.QuestionRepository;
 import com.example.sbb.service.AnswerService;
 import com.example.sbb.service.QuestionService;
 import com.example.sbb.service.user.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,10 +46,52 @@ public class QuestionController {
         model.addAttribute("kw", kw);
         return "question_list";
     }
+
+    /**
+     *
+     * @param model
+     * @param id
+     * @param answerForm
+     * @param page
+     * @param request
+     * @param response
+     * @return
+     *
+     * https://velog.io/@juwonlee920/Spring-조회수-기능-구현-조회수-중복-방지
+     */
     @GetMapping("/detail/{id}")
     public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm,
-                         @RequestParam(value = "page", defaultValue = "1") int page) {
+                         @RequestParam(value = "page", defaultValue = "1") int page,
+                         HttpServletRequest request,
+                         HttpServletResponse response) {
         Question question = this.questionService.getQuestion(id);
+
+        Cookie oldCookie = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("postHits")) {
+                    oldCookie = cookie;
+                }
+            }
+        }
+
+        if (oldCookie != null) {
+            if (!oldCookie.getValue().contains("[" + id.toString() + "]")) {
+                this.questionService.updateHits(id);
+                oldCookie.setValue(oldCookie.getValue() + "_[" + id + "]");
+                oldCookie.setPath("/");
+                oldCookie.setMaxAge(60 * 60 * 24);
+                response.addCookie(oldCookie);
+            }
+        } else {
+            this.questionService.updateHits(id);
+            Cookie newCookie = new Cookie("postHits", "[" + id + "]");
+            newCookie.setPath("/");
+            newCookie.setMaxAge(60 * 60 * 24);
+            response.addCookie(newCookie);
+        }
+
         Page<Answer> paging = this.answerService.getList(page, id);
         model.addAttribute("paging", paging);
         model.addAttribute("question", question);
@@ -117,4 +162,5 @@ public class QuestionController {
         this.questionService.vote(question, siteUser);
         return String.format("redirect:/question/detail/%s", id);
     }
+
 }

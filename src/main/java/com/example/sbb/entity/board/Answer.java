@@ -27,4 +27,6 @@ public class Answer extends BaseEntity {
 
     @ManyToMany
     Set<SiteUser> voter;
+
+
 }

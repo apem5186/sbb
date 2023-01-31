@@ -5,10 +5,13 @@ import com.example.sbb.dto.UserCreateForm;
 import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.repository.UserRepository;
 import com.example.sbb.service.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -131,5 +136,24 @@ public class UserController {
     @GetMapping("/login")
     public String login() {
         return "login_form";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/delete/{id}")
+    public String delete(Principal principal, @PathVariable("id") Long id,
+                         HttpServletRequest request) {
+        SiteUser siteUser = this.userService.getUserWithId(id);
+        if (!siteUser.getUsername().equals(principal.getName())) {
+            log.info("========================================");
+            log.info("SITEUSERNAME : " + siteUser.getUsername());
+            log.info("PRINCIPALNAME : " + principal.getName());
+            log.info("========================================");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
+        }
+        this.userService.delete(siteUser);
+        HttpSession session = request.getSession(false);
+        session.invalidate();
+        SecurityContextHolder.clearContext();
+        return "redirect:/question/list";
     }
 }

@@ -6,7 +6,6 @@ import com.example.sbb.entity.board.Question;
 import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.exception.DataNotFoundException;
 import com.example.sbb.repository.AnswerRepository;
-import com.example.sbb.repository.QuestionRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -28,7 +27,6 @@ import java.util.Optional;
 public class AnswerService {
 
     private final AnswerRepository answerRepository;
-    private final QuestionRepository questionRepository;
 
     public Page<Answer> getList(int page, Integer id) {
         List<Sort.Order> sorts = new ArrayList<>();
@@ -59,6 +57,22 @@ public class AnswerService {
     public void modify(Answer answer, String content) {
         answer.setContent(content);
         this.answerRepository.save(answer);
+    }
+
+    public Answer getHigherVoter(Integer id) {
+        List<Answer> answerList = answerRepository.findAnswerByQuestionId(id);
+        int voterSize = 0;
+        Answer answers = new Answer();
+        for (Answer answer : answerList) {
+            if (answer.getVoter().size() > voterSize) {
+                voterSize = answer.getVoter().size();
+                answers = answer;
+            }
+        }
+        if (voterSize == 0) {
+            return null;
+        }
+        return answers;
     }
 
     public void delete(Answer answer) {

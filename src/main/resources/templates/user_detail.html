@@ -3,8 +3,12 @@
     <h5 class="my-3 border-bottom pb-2">Profile</h5>
     <button type="button" id="userModify" class="btn btn-outline-secondary fw-semibold"
             onclick="userModify()">Modify</button>
-    <button type="button" id="userDelete" class="btn btn-outline-danger fw-semibold"
-            onclick="userDelete()">Delete</button>
+    <a href="javascript:void(0);" th:data-uri="@{|/user/delete/${profileDTO.getId()}|}"
+       id="user_delete"
+       class="delete btn btn-outline-danger fw-semibold" sec:authorize="isAuthenticated()"
+       th:text="Delete"></a>
+<!--    <button type="button" id="userDelete" class="btn btn-outline-danger fw-semibold"-->
+<!--            onclick="userDelete()">Delete</button>-->
     <div class="card border-start border-3" style="background-color: white" id="user_card">
         <div class="card-header">
             <span class="mb-3">
@@ -60,3 +64,11 @@
                 onclick="userModifyCancel()">Cancel</button>
     </form>
 </div>
+<script layout:fragment="script" type="text/javascript">
+    const user_delete_elements = document.getElementById("user_delete");
+    user_delete_elements.addEventListener('click', function () {
+        if (confirm("정말로 삭제하시겠습니까?")) {
+            location.href = this.dataset.uri;
+        }
+    })
+</script>
