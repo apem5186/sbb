@@ -16,9 +16,11 @@ public class ProfileDTO {
 
     private String email;
 
-    private String regDate;
+    private LocalDateTime regDate;
 
-    private String modDate;
+    private LocalDateTime modDate;
+
+    private String sub;
 
     public ProfileDTO(SiteUser siteUser) {
         this.id = siteUser.getId();
@@ -26,5 +28,6 @@ public class ProfileDTO {
         this.email = siteUser.getEmail();
         this.regDate = siteUser.getRegDate();
         this.modDate = siteUser.getModDate();
+        this.sub = siteUser.getSub();
     }
 }

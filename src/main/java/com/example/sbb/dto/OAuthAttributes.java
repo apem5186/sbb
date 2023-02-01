@@ -19,6 +19,7 @@ public class OAuthAttributes {
     private String username;
     private String email;
     private UserRole userRole;
+    private String sub;
 
     public static OAuthAttributes of(String registrationId,
                                      String userNameAttributeName,
@@ -32,6 +33,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .username((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
+                .sub((String) attributes.get("sub"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
@@ -41,6 +43,7 @@ public class OAuthAttributes {
         return SiteUser.builder()
                 .username(username)
                 .email(email)
+                .sub(sub)
                 .role(UserRole.SOCIAL)
                 .build();
 

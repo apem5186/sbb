@@ -84,7 +84,7 @@ public class QuestionService {
     }
 
     @Transactional
-    public int updateHits(Integer id) {
-        return this.questionRepository.updateHits(id);
+    public void updateHits(Integer id) {
+        this.questionRepository.updateHits(id);
     }
 }

@@ -9,6 +9,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -34,11 +35,15 @@ public class SiteUser extends BaseEntity {
     @Column(nullable = false)
     private UserRole role;
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
+    @Column(unique = true)
+    private String sub;
+
+    @OneToMany(mappedBy = "id", cascade = CascadeType.REMOVE)
     private List<Answer> answerList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "id", cascade = CascadeType.REMOVE)
     private List<Question> questionList = new ArrayList<>();
+
 
     public void modify(String username, String password, String email) {
         this.username = username;

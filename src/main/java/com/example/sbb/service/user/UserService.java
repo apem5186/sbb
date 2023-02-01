@@ -1,8 +1,12 @@
 package com.example.sbb.service.user;
 
+import com.example.sbb.entity.board.Answer;
+import com.example.sbb.entity.board.Question;
 import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.entity.user.UserRole;
 import com.example.sbb.exception.DataNotFoundException;
+import com.example.sbb.repository.AnswerRepository;
+import com.example.sbb.repository.QuestionRepository;
 import com.example.sbb.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -19,6 +25,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AnswerRepository answerRepository;
+    private final QuestionRepository questionRepository;
 
     @Transactional
     public SiteUser create(String username, String email, String password) {
@@ -61,6 +69,16 @@ public class UserService {
 
     @Transactional
     public void delete(SiteUser siteUser) {
+        List<Answer> answerList = siteUser.getAnswerList();
+        List<Question> questionList = siteUser.getQuestionList();
+        for (Answer answer : answerList) {
+            answer.getVoter().remove(siteUser);
+            this.answerRepository.save(answer);
+        }
+        for (Question question : questionList) {
+            question.getVoter().remove(siteUser);
+            this.questionRepository.save(question);
+        }
         this.userRepository.delete(siteUser);
     }
 }

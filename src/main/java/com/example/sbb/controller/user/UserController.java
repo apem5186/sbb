@@ -16,7 +16,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.Principal;
+import java.util.Collection;
 
 @RequiredArgsConstructor
 @Controller
@@ -74,8 +77,17 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify")
-    public String modify(UserCreateForm userCreateForm, Model model, Principal principal) {
-        SiteUser siteUser = userService.getUser(principal.getName());
+    public String modify(UserCreateForm userCreateForm, Model model, Principal principal,
+                         Authentication authentication) {
+        SiteUser siteUser = new SiteUser();
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        if (authority.toString().equals("[ROLE_USER]")) {
+            siteUser = this.userService.getUser(principal.getName());
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            siteUser = this.userService.getUser(username);
+        }
         ProfileDTO profileDTO = new ProfileDTO(siteUser);
         model.addAttribute("profileDTO", profileDTO);
         return "user_detail";
@@ -84,8 +96,16 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify")
     public String modify(@Valid UserCreateForm userCreateForm, BindingResult bindingResult, Principal principal,
-                         Model model) {
-        SiteUser siteUser = userRepository.findByUsername(principal.getName()).orElseThrow();
+                         Model model, Authentication authentication) {
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        SiteUser siteUser = new SiteUser();
+        if (authority.toString().equals("[ROLE_USER]")) {
+            siteUser = this.userService.getUser(principal.getName());
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            siteUser = this.userService.getUser(username);
+        }
         ProfileDTO profileDTO = new ProfileDTO(siteUser);
         if (bindingResult.hasErrors()) {
             log.info("SITE USER : " + siteUser.getEmail());
@@ -104,7 +124,7 @@ public class UserController {
             userService.modify(userCreateForm.getUsername(), userCreateForm.getEmail(),
                     userCreateForm.getPassword1(), siteUser);
             /* 변경된 세션 등록 */
-            Authentication authentication = authenticationManager.authenticate(
+            authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userCreateForm.getUsername(), userCreateForm.getPassword1()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (Exception e) {
@@ -141,15 +161,29 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
     public String delete(Principal principal, @PathVariable("id") Long id,
-                         HttpServletRequest request) {
+                         HttpServletRequest request,
+                         Authentication authentication) {
         SiteUser siteUser = this.userService.getUserWithId(id);
-        if (!siteUser.getUsername().equals(principal.getName())) {
-            log.info("========================================");
-            log.info("SITEUSERNAME : " + siteUser.getUsername());
-            log.info("PRINCIPALNAME : " + principal.getName());
-            log.info("========================================");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        if (authority.toString().equals("[ROLE_USER]")) {
+            if (!siteUser.getUsername().equals(principal.getName())) {
+                log.info("========================================");
+                log.info("SITEUSERNAME : " + siteUser.getUsername());
+                log.info("PRINCIPALNAME : " + principal.getName());
+                log.info("========================================");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
+            }
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            if (!siteUser.getUsername().equals(username)) {
+                log.info("========================================");
+                log.info("SITEUSERNAME : " + siteUser.getUsername());
+                log.info("OAUTH2NAME : " + username);
+                log.info("========================================");
+            }
         }
+
         this.userService.delete(siteUser);
         HttpSession session = request.getSession(false);
         session.invalidate();

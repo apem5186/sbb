@@ -18,20 +18,20 @@ public abstract class BaseEntity {
 
     @CreatedDate
     @Column(name = "regDate", updatable = false)
-    private String regDate;
+    private LocalDateTime regDate;
 
     @LastModifiedDate
     @Column(name = "modDate")
-    private String modDate;
+    private LocalDateTime modDate;
 
     @PrePersist
     public void onPrePersist() {
-        this.regDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+        this.regDate = LocalDateTime.now();
         this.modDate = this.regDate;
     }
 
     @PreUpdate
     public void onPreUpdate() {
-        this.modDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+        this.modDate = LocalDateTime.now();
     }
 }

@@ -15,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.Collection;
 
 @Controller
 @Slf4j
@@ -37,9 +41,19 @@ public class AnswerController {
     @PostMapping("/create/{id}")
     public String createAnswer(Model model, @PathVariable("id") Integer id,
                                @Valid AnswerForm answerForm, BindingResult bindingResult,
-                               Principal principal) {
+                               Principal principal,
+                               Authentication authentication) {
         Question question = this.questionService.getQuestion(id);
-        SiteUser siteUser = this.userService.getUser(principal.getName());
+        SiteUser siteUser = new SiteUser();
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        log.info("----------" + authority);
+        if (authority.toString().equals("[ROLE_USER]")) {
+            siteUser = this.userService.getUser(principal.getName());
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            siteUser = this.userService.getUser(username);
+        }
         if (bindingResult.hasErrors()) {
             model.addAttribute("question", question);
             return "question_detail";
@@ -51,10 +65,21 @@ public class AnswerController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
-    public String answerModify(AnswerForm answerForm, @PathVariable("id") Integer id, Principal principal) {
+    public String answerModify(AnswerForm answerForm, @PathVariable("id") Integer id,
+                               Principal principal,
+                               Authentication authentication) {
         Answer answer = this.answerService.getAnswer(id);
-        if (!answer.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        if (authority.toString().equals("[ROLE_USER]")) {
+            if (!answer.getAuthor().getUsername().equals(principal.getName())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+            }
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            if (!answer.getAuthor().getUsername().equals(username)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+            }
         }
         answerForm.setContent(answer.getContent());
         return "answer_form";
@@ -63,13 +88,24 @@ public class AnswerController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
     public String answerModify(@Valid AnswerForm answerForm,
-                               BindingResult bindingResult, @PathVariable("id") Integer id, Principal principal) {
+                               BindingResult bindingResult, @PathVariable("id") Integer id,
+                               Principal principal,
+                               Authentication authentication) {
         if (bindingResult.hasErrors()) {
             return "answer_form";
         }
         Answer answer = this.answerService.getAnswer(id);
-        if (!answer.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        if (authority.toString().equals("[ROLE_USER]")) {
+            if (!answer.getAuthor().getUsername().equals(principal.getName())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+            }
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            if (!answer.getAuthor().getUsername().equals(username)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+            }
         }
         this.answerService.modify(answer, answerForm.getContent());
         return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(), answer.getId());
@@ -77,10 +113,20 @@ public class AnswerController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
-    public String answerDelete(Principal principal, @PathVariable("id") Integer id) {
+    public String answerDelete(Principal principal, @PathVariable("id") Integer id,
+                               Authentication authentication) {
         Answer answer = this.answerService.getAnswer(id);
-        if (!answer.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        if (authority.toString().equals("[ROLE_USER]")) {
+            if (!answer.getAuthor().getUsername().equals(principal.getName())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
+            }
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            if (!answer.getAuthor().getUsername().equals(username)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
+            }
         }
         this.answerService.delete(answer);
         return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(), answer.getId());
@@ -88,9 +134,18 @@ public class AnswerController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/vote/{id}")
-    public String answerVote(Principal principal, @PathVariable("id") Integer id) {
+    public String answerVote(Principal principal, @PathVariable("id") Integer id,
+                             Authentication authentication) {
         Answer answer = this.answerService.getAnswer(id);
-        SiteUser siteUser = this.userService.getUser(principal.getName());
+        SiteUser siteUser = new SiteUser();
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        if (authority.toString().equals("[ROLE_USER]")) {
+            siteUser = this.userService.getUser(principal.getName());
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            siteUser = this.userService.getUser(username);
+        }
         this.answerService.vote(answer, siteUser);
         return String.format("redirect:/question/detail/%s", answer.getQuestion().getId());
     }

@@ -1,11 +1,11 @@
 package com.example.sbb.controller.question;
 
 import com.example.sbb.dto.AnswerForm;
-import com.example.sbb.dto.ProfileDTO;
 import com.example.sbb.dto.QuestionForm;
 import com.example.sbb.entity.board.Answer;
 import com.example.sbb.entity.board.Question;
 import com.example.sbb.entity.user.SiteUser;
+import com.example.sbb.entity.user.UserRole;
 import com.example.sbb.repository.QuestionRepository;
 import com.example.sbb.service.AnswerService;
 import com.example.sbb.service.QuestionService;
@@ -20,8 +20,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.Collection;
 
 @Controller
 @Slf4j
@@ -117,32 +118,40 @@ public class QuestionController {
         if (bindingResult.hasErrors()) {
             return "question_form";
         }
-        log.info("99999999999999999999999999999999999999");
-        log.info("PRINCIPAL : " + authentication.getPrincipal());
-        log.info("PRINCIPAL : " + authentication.getName());
-        log.info("PRINCIPAL : " + authentication.getDetails());
-        log.info("PRINCIPAL : " + authentication.getAuthorities());
-        log.info("PRINCIPAL : " + authentication.getCredentials());
-        log.info("99999999999999999999999999999999999999");
-        // TODO : User user = (User) authentication.getPrincipal();
-        // TODO : user.getUsername() 하면 닉네임 가져올 수 있지만
-        // TODO : java.lang.ClassCastException: class org.springframework.security.oauth2.core.user.DefaultOAuth2User cannot be cast to class org.springframework.security.core.userdetails.User
-        // TODO : cast 에러 뜨면서 안됨 구글 쳐서 해결법 강구해야함
-        SiteUser siteUser = this.userService.getUser(user.getUsername());
-        log.info("================================");
-        log.info("SITE USER : " + siteUser.getUsername());
-        log.info("================================");
+        SiteUser siteUser = new SiteUser();
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        log.info("----------" + authority);
+        if (authority.toString().equals("[ROLE_USER]")) {
+            siteUser = this.userService.getUser(principal.getName());
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            siteUser = this.userService.getUser(username);
+        }
+
         this.questionService.create(questionForm.getSubject(), questionForm.getContent(), siteUser);
         return "redirect:/question/list";
     }
-
+    // TODO : 수정도 Authentication 객체 넣어서 고치기 user랑 social이랑 구분해서
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
-    public String questionModify(QuestionForm questionForm, @PathVariable("id") Integer id, Principal principal) {
+    public String questionModify(QuestionForm questionForm, @PathVariable("id") Integer id,
+                                 Principal principal,
+                                 Authentication authentication) {
         Question question = this.questionService.getQuestion(id);
-        if (!question.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        if (authority.toString().equals("[ROLE_USER]")) {
+            if (!question.getAuthor().getUsername().equals(principal.getName())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+            }
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            if (!question.getAuthor().getUsername().equals(username)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+            }
         }
+
         questionForm.setSubject(question.getSubject());
         questionForm.setContent(question.getContent());
         return "question_form";
@@ -151,13 +160,23 @@ public class QuestionController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
     public String questionModify(@Valid QuestionForm questionForm, BindingResult bindingResult,
-                                 Principal principal, @PathVariable("id") Integer id) {
+                                 Principal principal, @PathVariable("id") Integer id,
+                                 Authentication authentication) {
         if (bindingResult.hasErrors()) {
             return "question_form";
         }
         Question question = this.questionService.getQuestion(id);
-        if (!question.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        if (authority.toString().equals("[ROLE_USER]")) {
+            if (!question.getAuthor().getUsername().equals(principal.getName())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+            }
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            if (!question.getAuthor().getUsername().equals(username)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+            }
         }
         this.questionService.modify(question, questionForm.getSubject(), questionForm.getContent());
         return String.format("redirect:/question/detail/%s", id);
@@ -165,10 +184,20 @@ public class QuestionController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
-    public String questionDelete(Principal principal, @PathVariable("id") Integer id) {
+    public String questionDelete(Principal principal, @PathVariable("id") Integer id,
+                                 Authentication authentication) {
         Question question = this.questionService.getQuestion(id);
-        if (!question.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        if (authority.toString().equals("[ROLE_USER]")) {
+            if (!question.getAuthor().getUsername().equals(principal.getName())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
+            }
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            if (!question.getAuthor().getUsername().equals(username)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
+            }
         }
         this.questionService.delete(question);
         return "redirect:/";
@@ -176,9 +205,18 @@ public class QuestionController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/vote/{id}")
-    public String questionVote(Principal principal, @PathVariable("id") Integer id) {
+    public String questionVote(Principal principal, @PathVariable("id") Integer id,
+                               Authentication authentication) {
         Question question = this.questionService.getQuestion(id);
-        SiteUser siteUser = this.userService.getUser(principal.getName());
+        SiteUser siteUser = new SiteUser();
+        Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+        if (authority.toString().equals("[ROLE_USER]")) {
+            siteUser = this.userService.getUser(principal.getName());
+        } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
+            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
+            siteUser = this.userService.getUser(username);
+        }
         this.questionService.vote(question, siteUser);
         return String.format("redirect:/question/detail/%s", id);
     }

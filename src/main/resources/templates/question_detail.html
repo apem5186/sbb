@@ -8,13 +8,13 @@
             <div class="d-flex justify-content-end">
                 <div th:if="${question.modDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
                     <div class="mb-2">modified at</div>
-                    <div th:text="${question.modDate}"></div>
+                    <div th:text="${#temporals.format(question.modDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
                 <div class="badge bg-light text-dark p-2 text-start">
                     <div class="mb-2">
-                        <span th:if="${question.author != null}" th:text="${question.author.username}"></span>
+                        <span th:if="${question.author != null}" th:text="${question.author.getUsername()}"></span>
                     </div>
-                    <div th:text="${question.regDate}"></div>
+                    <div th:text="${#temporals.format(question.regDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
             </div>
             <div class="my-3">
@@ -24,15 +24,22 @@
                     <span class="badge rounded-pill bg-success" th:text="${#lists.size(question.voter)}"></span>
                 </a>
                 <a th:href="@{|/question/modify/${question.id}|}" class="btn btn-sm btn-outline-secondary"
-                sec:authorize="isAuthenticated()"
-                th:if="${question.author != null and
-                #authentication.getPrincipal().getUsername() == question.author.username}"
+                sec:authorize="hasRole('USER')"
+                th:if="${question.author != null and #authentication.name == question.author.username}"
                 th:text="수정"></a>
+                <a th:href="@{|/question/modify/${question.id}|}" class="btn btn-sm btn-outline-secondary"
+                   sec:authorize="hasRole('SOCIAL')"
+                   th:if="${question.author != null and #authentication.name == question.author.sub}"
+                   th:text="수정"></a>
 <!-- href에 url을 적지 않는 이유는 확인 절차 문구를 넣어야 하기 때문 -->
 <!-- data-uri 속성은 자바스크립트에서 클릭 이벤트 발생시 this.dataset.uri와 같이 사용하여 그 값을 얻을 수 있다.-->
                 <a href="javascript:void(0);" th:data-uri="@{|/question/delete/${question.id}|}"
-                   class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
-                   th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
+                   class="delete btn btn-sm btn-outline-secondary" sec:authorize="hasRole('USER')"
+                   th:if="${question.author != null and #authentication.name == question.author.username}"
+                   th:text="삭제"></a>
+                <a href="javascript:void(0);" th:data-uri="@{|/question/delete/${question.id}|}"
+                   class="delete btn btn-sm btn-outline-secondary" sec:authorize="hasRole('SOCIAL')"
+                   th:if="${question.author != null and #authentication.name == question.author.sub}"
                    th:text="삭제"></a>
             </div>
         </div>
@@ -48,13 +55,13 @@
             <div class="d-flex justify-content-end">
                 <div th:if="${answer.modDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
                     <div class="mb-2">modified at</div>
-                    <div th:text="${answer.modDate}"></div>
+                    <div th:text="${#temporals.format(answer.modDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
                 <div class="badge bg-light text-dark p-2 text-start">
                     <div class="mb-2">
                         <span th:if="${answer.author != null}" th:text="${answer.author.username}"></span>
                     </div>
-                    <div th:text="${answer.regDate}"></div>
+                    <div th:text="${#temporals.format(answer.regDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
             </div>
             <div class="my-3">
@@ -64,12 +71,20 @@
                     <span class="badge rounded-pill bg-success" th:text="${#lists.size(answer.voter)}"></span>
                 </a>
                 <a th:href="@{|/answer/modify/${answer.id}|}" class="btn btn-sm btn-outline-secondary"
-                   sec:authorize="isAuthenticated()"
-                   th:if="${answer.author != null and #authentication.getPrincipal().getUsername()
+                   sec:authorize="hasRole('USER')"
+                   th:if="${answer.author != null and #authentication.name
                    == answer.author.username}" th:text="수정"></a>
+                <a th:href="@{|/answer/modify/${answer.id}|}" class="btn btn-sm btn-outline-secondary"
+                   sec:authorize="hasRole('SOCIAL')"
+                   th:if="${answer.author != null and #authentication.name
+                   == answer.author.sub}" th:text="수정"></a>
                 <a href="javascript:void(0);" th:data-uri="@{|/answer/delete/${answer.id}|}"
-                   class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
-                   th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
+                   class="delete btn btn-sm btn-outline-secondary" sec:authorize="hasRole('USER')"
+                   th:if="${answer.author != null and #authentication.name == answer.author.username}"
+                   th:text="삭제"></a>
+                <a href="javascript:void(0);" th:data-uri="@{|/answer/delete/${answer.id}|}"
+                   class="delete btn btn-sm btn-outline-secondary" sec:authorize="hasRole('SOCIAL')"
+                   th:if="${answer.author != null and #authentication.name == answer.author.sub}"
                    th:text="삭제"></a>
             </div>
         </div>
