@@ -1,6 +1,7 @@
 package com.example.sbb.repository;
 
 import com.example.sbb.entity.board.Question;
+import com.example.sbb.entity.user.SiteUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,4 +22,8 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Modifying
     @Query("update Question q set q.hits = q.hits + 1 where q.id =:id")
     int updateHits(@Param("id") Integer id);
+
+    @Modifying
+    @Query(value = "DELETE FROM question_voter WHERE VOTER_ID = :id", nativeQuery = true)
+    void deleteVote(@Param("id") Integer id);
 }

@@ -19,13 +19,16 @@ public class Answer extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne
+    @ManyToOne(targetEntity = SiteUser.class)
     private SiteUser author;
 
     @ManyToOne
     private Question question;
 
-    @ManyToMany
+    @ManyToMany(targetEntity = SiteUser.class)
+    @JoinTable(name = "ANSWER_VOTER",
+    joinColumns = @JoinColumn(name = "ANSWER_ID"),
+    inverseJoinColumns = @JoinColumn(name = "VOTER_ID"))
     Set<SiteUser> voter;
 
 

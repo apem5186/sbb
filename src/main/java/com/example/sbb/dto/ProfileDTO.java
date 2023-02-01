@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 public class ProfileDTO {
 
-    private Long id;
+    private Integer id;
 
     private String username;
 

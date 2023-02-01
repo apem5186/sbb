@@ -27,13 +27,16 @@ public class Question extends BaseEntity {
     @Column(columnDefinition = "integer default 0", nullable = false)
     private int hits;
 
-    @ManyToOne
+    @ManyToOne(targetEntity = SiteUser.class)
     private SiteUser author;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     private List<Answer> answerList;
 
     // Set은 중복을 허용하지 않는 자료형이다.
-    @ManyToMany
+    @ManyToMany(targetEntity = SiteUser.class)
+    @JoinTable(name = "QUESTION_VOTER",
+            joinColumns = @JoinColumn(name = "QUESTION_ID"),
+            inverseJoinColumns = @JoinColumn(name = "VOTER_ID"))
     Set<SiteUser> voter;
 }

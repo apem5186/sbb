@@ -21,7 +21,7 @@ public class SiteUser extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(unique = true)
     private String username;
@@ -38,10 +38,10 @@ public class SiteUser extends BaseEntity {
     @Column(unique = true)
     private String sub;
 
-    @OneToMany(mappedBy = "id", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
     private List<Answer> answerList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "id", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
     private List<Question> questionList = new ArrayList<>();
 
 

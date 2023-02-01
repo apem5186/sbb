@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @RequiredArgsConstructor
 public class UserSessionDto {
-    private final Long id;
+    private final Integer id;
     private final String username;
     private final String email;
     private final UserRole userRole;

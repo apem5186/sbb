@@ -184,6 +184,10 @@ public class UserController {
             }
         }
 
+        log.info("SITEEEEEE : " + siteUser.getId());
+        log.info("SITEEEEEE : " + siteUser.getAnswerList());
+        log.info("SITEEEEEE : " + siteUser.getQuestionList());
+
         this.userService.delete(siteUser);
         HttpSession session = request.getSession(false);
         session.invalidate();

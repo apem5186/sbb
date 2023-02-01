@@ -8,6 +8,8 @@ import com.example.sbb.exception.DataNotFoundException;
 import com.example.sbb.repository.AnswerRepository;
 import com.example.sbb.repository.QuestionRepository;
 import com.example.sbb.repository.UserRepository;
+import com.example.sbb.service.AnswerService;
+import com.example.sbb.service.QuestionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AnswerRepository answerRepository;
     private final QuestionRepository questionRepository;
+    private final AnswerService answerService;
+    private final QuestionService questionService;
 
     @Transactional
     public SiteUser create(String username, String email, String password) {
@@ -71,13 +75,13 @@ public class UserService {
     public void delete(SiteUser siteUser) {
         List<Answer> answerList = siteUser.getAnswerList();
         List<Question> questionList = siteUser.getQuestionList();
+        answerRepository.deleteVote(siteUser.getId());
+        questionRepository.deleteVote(siteUser.getId());
         for (Answer answer : answerList) {
-            answer.getVoter().remove(siteUser);
-            this.answerRepository.save(answer);
+            answerService.delete(answer);
         }
         for (Question question : questionList) {
-            question.getVoter().remove(siteUser);
-            this.questionRepository.save(question);
+            questionService.delete(question);
         }
         this.userRepository.delete(siteUser);
     }
