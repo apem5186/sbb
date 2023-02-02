@@ -20,7 +20,8 @@ public class ProfileDTO {
 
     private LocalDateTime modDate;
 
-    private String sub;
+    private String providerId;
+    private String provider;
 
     public ProfileDTO(SiteUser siteUser) {
         this.id = siteUser.getId();
@@ -28,6 +29,7 @@ public class ProfileDTO {
         this.email = siteUser.getEmail();
         this.regDate = siteUser.getRegDate();
         this.modDate = siteUser.getModDate();
-        this.sub = siteUser.getSub();
+        this.providerId = siteUser.getProviderId();
+        this.provider = siteUser.getProvider();
     }
 }

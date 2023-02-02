@@ -58,7 +58,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         SiteUser siteUser = userRepository.findByEmail(attributes.getEmail())
                 .map(SiteUser::updateModifiedDate)
                 .orElse(attributes.toEntity());
-
+        // TODO : 이메일이 같은 소셜 로그인 진행시 에러 처리해야함 이 방법으로 안됨
+        if (!siteUser.getProvider().equals(attributes.getProvider())) {
+            throw new OAuth2AuthenticationException("이미 있는 계정이거나 다른 소셜로그인이 진행되었습니다. 다른 방식으로 로그인 해주세요.");
+        }
         return userRepository.save(siteUser);
     }
 }

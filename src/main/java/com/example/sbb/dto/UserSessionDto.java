@@ -18,7 +18,8 @@ public class UserSessionDto {
     private final String email;
     private final UserRole userRole;
 
-    private final String sub;
+    private final String providerId;
+    private final String provider;
     private final LocalDateTime modDate;
 
     public UserSessionDto(SiteUser siteUser) {
@@ -26,7 +27,8 @@ public class UserSessionDto {
         this.username = siteUser.getUsername();
         this.email = siteUser.getEmail();
         this.userRole = siteUser.getRole();
-        this.sub = siteUser.getSub();
+        this.providerId = siteUser.getProviderId();
+        this.provider = siteUser.getProvider();
         this.modDate = siteUser.getModDate();
     }
 

@@ -36,7 +36,9 @@ public class SiteUser extends BaseEntity {
     private UserRole role;
 
     @Column(unique = true)
-    private String sub;
+    private String providerId;
+
+    private String provider;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
     private List<Answer> answerList = new ArrayList<>();

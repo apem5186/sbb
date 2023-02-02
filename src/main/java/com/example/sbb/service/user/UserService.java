@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -57,6 +56,17 @@ public class UserService {
         } else {
             log.info("------------------------------");
             log.info("USERNAME : " + username);
+            log.info("------------------------------");
+            throw new DataNotFoundException("siteuser not found");
+        }
+    }
+    public SiteUser getUserByEmail(String email) {
+        Optional<SiteUser> siteUser = this.userRepository.findByEmail(email);
+        if (siteUser.isPresent()) {
+            return siteUser.get();
+        } else {
+            log.info("------------------------------");
+            log.info("Email : " + email);
             log.info("------------------------------");
             throw new DataNotFoundException("siteuser not found");
         }

@@ -51,8 +51,8 @@ public class AnswerController {
             siteUser = this.userService.getUser(principal.getName());
         } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
             DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
-            siteUser = this.userService.getUser(username);
+            String email = String.valueOf(oAuth2User.getAttributes().get("email"));
+            siteUser = this.userService.getUserByEmail(email);
         }
         if (bindingResult.hasErrors()) {
             model.addAttribute("question", question);
@@ -76,8 +76,9 @@ public class AnswerController {
             }
         } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
             DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
-            if (!answer.getAuthor().getUsername().equals(username)) {
+            String email = String.valueOf(oAuth2User.getAttributes().get("email"));
+            SiteUser siteUser = userService.getUserByEmail(email);
+            if (!answer.getAuthor().getUsername().equals(siteUser.getUsername())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
             }
         }
@@ -102,8 +103,9 @@ public class AnswerController {
             }
         } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
             DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
-            if (!answer.getAuthor().getUsername().equals(username)) {
+            String email = String.valueOf(oAuth2User.getAttributes().get("email"));
+            SiteUser siteUser = userService.getUserByEmail(email);
+            if (!answer.getAuthor().getUsername().equals(siteUser.getUsername())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
             }
         }
@@ -123,8 +125,9 @@ public class AnswerController {
             }
         } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
             DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
-            if (!answer.getAuthor().getUsername().equals(username)) {
+            String email = String.valueOf(oAuth2User.getAttributes().get("email"));
+            SiteUser siteUser = userService.getUserByEmail(email);
+            if (!answer.getAuthor().getUsername().equals(siteUser.getUsername())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
             }
         }
@@ -143,8 +146,8 @@ public class AnswerController {
             siteUser = this.userService.getUser(principal.getName());
         } else if (authority.toString().equals("[ROLE_SOCIAL]")) {
             DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-            String username = String.valueOf(oAuth2User.getAttributes().get("name"));
-            siteUser = this.userService.getUser(username);
+            String email = String.valueOf(oAuth2User.getAttributes().get("email"));
+            siteUser = this.userService.getUserByEmail(email);
         }
         this.answerService.vote(answer, siteUser);
         return String.format("redirect:/question/detail/%s", answer.getQuestion().getId());
