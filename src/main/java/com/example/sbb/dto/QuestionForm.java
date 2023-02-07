@@ -1,5 +1,6 @@
 package com.example.sbb.dto;
 
+import com.example.sbb.entity.board.Category;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -14,4 +15,7 @@ public class QuestionForm {
 
     @NotEmpty(message = "내용은 필수사항입니다.")
     private String content;
+
+    @NotEmpty(message = "카테고리는 필수사항입니다.")
+    private String category;
 }

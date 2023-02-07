@@ -1,6 +1,7 @@
 package com.example.sbb.service;
 
 import com.example.sbb.entity.board.Answer;
+import com.example.sbb.entity.board.Category;
 import com.example.sbb.entity.board.Question;
 import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.exception.DataNotFoundException;
@@ -24,7 +25,7 @@ import java.util.Optional;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
-
+    // TODO : CATEGORY 별로 나타내게 해야함
     public Page<Question> getList(int page, String kw) {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("regDate"));
@@ -42,17 +43,27 @@ public class QuestionService {
         }
     }
 
-    public void create(String subject, String content, SiteUser user) {
+    public void create(String subject, String content, String category, SiteUser user) {
+        Category category1 = Category.FREE;
+        if (category.equals("question")) {
+            category1 = Category.QUESTION;
+        }
         Question q = new Question();
         q.setContent(content);
         q.setSubject(subject);
+        q.setCategory(category1);
         q.setAuthor(user);
         this.questionRepository.save(q);
     }
 
-    public void modify(Question question, String subject, String content) {
+    public void modify(Question question, String subject, String content, String category) {
+        Category category1 = Category.FREE;
+        if (category.equals("question")) {
+            category1 = Category.QUESTION;
+        }
         question.setContent(content);
         question.setSubject(subject);
+        question.setCategory(category1);
         this.questionRepository.save(question);
     }
 

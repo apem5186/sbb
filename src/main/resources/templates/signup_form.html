@@ -7,6 +7,7 @@
     </div>
     <form th:action="@{/user/signup}" th:object="${userCreateForm}" method="post">
         <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+
         <div class="mb-3">
             <label for="username" class="form-label">사용자ID</label>
             <input type="text" th:field="*{username}" class="form-control">
@@ -28,12 +29,14 @@
     <br>
     <div>
         <a href="/oauth2/authorization/google" role="button" class="btn btn-outline-danger bi bi-google"></a>
-        <a href="/oauth2/authorization/naver" role="button" class="btn btn-outline-success bi bi-naver"
-        style="width: 41.6px; height: 37.6px; display: inline-block;">
+        <a href="/oauth2/authorization/naver" role="button" class="btn btn-outline-success bi"
+           style="padding: 0px 1px 1px 0px;">
             <img id="naverImg" src="/img/naver.ico"
-            style="width: 41.6px; height: 37.6px; border-radius: 5px"/></a>
-        <a href="/oauth2/authorization/kakao" role="button" class="btn btn-outline-warn bi bi-kakao">
-            <img id="kakaoImg" src="/img/kakaotalk.ico" />
+                 style="width: 40px; height: 36px; border-radius: 5px;"/></a>
+        <a href="/oauth2/authorization/kakao" role="button" class="btn btn-outline-warning bi bi-kakao"
+           style="padding: 0px 1px 1px 0px;">
+            <img id="kakaoImg" src="/img/kakaotalk.ico"
+                 style="width: 40px; height: 36px; border-radius: 5px;"/>
         </a>
     </div>
 </div>

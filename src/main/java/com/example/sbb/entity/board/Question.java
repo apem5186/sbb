@@ -27,6 +27,10 @@ public class Question extends BaseEntity {
     @Column(columnDefinition = "integer default 0", nullable = false)
     private int hits;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category;
+
     @ManyToOne(targetEntity = SiteUser.class)
     private SiteUser author;
 

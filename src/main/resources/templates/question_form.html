@@ -7,6 +7,16 @@
 <!-- CSRF 값 수동으로 추가 CSRF를 수동으로 추가하기 위해선 th:action 태그가 없어야함    -->
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
     <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+      <div class="mb-3">
+          <div class="btn-group" role="group">
+              <input type="radio" th:field="*{category}" class="btn-check"
+                     value="free" name="cRadioCheck" id="cRadioCheck1" autocomplete="off" checked>
+              <label class="btn btn-outline-dark fw-bold" for="cRadioCheck1">자유게시판</label>
+              <input type="radio" th:field="*{category}" class="btn-check"
+                     value="question" name="cRadioCheck" id="cRadioCheck2" autocomplete="off">
+              <label class="btn btn-outline-dark fw-bold" for="cRadioCheck2">질문게시판</label>
+          </div>
+      </div>
     <div class="mb-3">
       <label for="subject" class="form-label">제목</label>
       <input type="text" th:field="*{subject}" name="subject" id="subject" class="form-control">

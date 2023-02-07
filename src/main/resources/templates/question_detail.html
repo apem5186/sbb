@@ -1,6 +1,8 @@
 <html layout:decorate="~{layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
 <div layout:fragment="content" class="container my-3">
     <!-- 질문 -->
+    <span class="fs-5 text-muted" th:text="자유게시판" th:if="${question.category.toString() == 'FREE'}"></span>
+    <span class="fs-5 text-muted" th:text="질문게시판" th:if="${question.category.toString() == 'QUESTION'}"></span>
     <h2 class="border-bottom py-2" th:text="${question.subject}"></h2>
     <div class="card my-3">
         <div class="card-body">

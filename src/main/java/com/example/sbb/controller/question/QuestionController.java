@@ -129,7 +129,8 @@ public class QuestionController {
             siteUser = this.userService.getUserByEmail(email);
         }
 
-        this.questionService.create(questionForm.getSubject(), questionForm.getContent(), siteUser);
+        this.questionService.create(questionForm.getSubject(), questionForm.getContent(),
+                questionForm.getCategory(), siteUser);
         return "redirect:/question/list";
     }
 
@@ -155,6 +156,7 @@ public class QuestionController {
 
         questionForm.setSubject(question.getSubject());
         questionForm.setContent(question.getContent());
+        questionForm.setCategory(String.valueOf(question.getCategory()));
         return "question_form";
     }
 
@@ -180,7 +182,8 @@ public class QuestionController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
             }
         }
-        this.questionService.modify(question, questionForm.getSubject(), questionForm.getContent());
+        this.questionService.modify(question, questionForm.getSubject(), questionForm.getContent(),
+                questionForm.getCategory());
         return String.format("redirect:/question/detail/%s", id);
     }
 

@@ -1,6 +1,7 @@
 package com.example.sbb;
 
 import com.example.sbb.entity.board.Answer;
+import com.example.sbb.entity.board.Category;
 import com.example.sbb.entity.board.Question;
 import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.repository.AnswerRepository;
@@ -46,10 +47,16 @@ class SbbApplicationTests {
 
     @Test
     void testJpa() {
-        for (int i = 1; i <= 300; i++) {
+        SiteUser siteUser = userRepository.findByUsername("user01").orElseThrow();
+        for (int i = 1; i <= 150; i++) {
             String subject = String.format("테스트 데이터입니다:[%03d]", i);
             String content = "내용무";
-            this.questionService.create(subject, content, null);
+            this.questionService.create(subject, content, "free", siteUser);
+        }
+        for (int i = 1; i <= 150; i++) {
+            String subject = String.format("테스트 데이터입니다:[%03d]", i);
+            String content = "내용무";
+            this.questionService.create(subject, content, "question", siteUser);
         }
 
     }
