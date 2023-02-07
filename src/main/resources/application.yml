@@ -25,11 +25,18 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     open-in-view: true
     database-platform: org.hibernate.dialect.H2Dialect
     generate-ddl: true
+
+server:
+  error:
+    include-exception: true
+    include-stacktrace: on_param  # parameter 있을때만
+    include-message: always
+    include-binding-errors: on_param
 # Pageable index를 1부터 시작하게 해줌
 # 잘 안되서 걍 안씀
 #  data:

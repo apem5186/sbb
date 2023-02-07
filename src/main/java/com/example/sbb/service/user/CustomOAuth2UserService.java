@@ -3,7 +3,10 @@ package com.example.sbb.service.user;
 import com.example.sbb.dto.OAuthAttributes;
 import com.example.sbb.dto.UserSessionDto;
 import com.example.sbb.entity.user.SiteUser;
+import com.example.sbb.exception.OAuthProviderMissMatchException;
 import com.example.sbb.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,9 +17,14 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.RedirectStrategy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Security UserDetailsService == OAuth OAuth2UserService
@@ -41,7 +49,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         /* OAuth2UserService */
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
-
+        process(attributes);
         SiteUser siteUser = saveOrUpdate(attributes);
 
         /* 세션 정보를 저장하는 직렬화된 dto 클래스 */
@@ -58,10 +66,25 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         SiteUser siteUser = userRepository.findByEmail(attributes.getEmail())
                 .map(SiteUser::updateModifiedDate)
                 .orElse(attributes.toEntity());
-        // TODO : 이메일이 같은 소셜 로그인 진행시 에러 처리해야함 이 방법으로 안됨
-        if (!siteUser.getProvider().equals(attributes.getProvider())) {
-            throw new OAuth2AuthenticationException("이미 있는 계정이거나 다른 소셜로그인이 진행되었습니다. 다른 방식으로 로그인 해주세요.");
-        }
         return userRepository.save(siteUser);
     }
+
+    private void process (OAuthAttributes oAuthAttributes) {
+        String provider = oAuthAttributes.getProvider();
+        Optional<SiteUser> siteUser = userRepository.findByEmail(oAuthAttributes.getEmail());
+        if (siteUser.isPresent()) {
+            String provider2 = siteUser.get().getProvider();
+            if (!Objects.equals(provider, siteUser.get().getProvider())) {
+                if (siteUser.get().getProvider().isEmpty()) {
+                    provider2 = "personal";
+                }
+
+                throw new OAuthProviderMissMatchException(
+                        "Looks like you're signed up with " + provider +
+                                " account. Please use your " + provider2 + " account to login."
+                );
+            }
+        }
+    }
+
 }

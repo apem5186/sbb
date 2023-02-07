@@ -1,5 +1,6 @@
 package com.example.sbb.config;
 
+import com.example.sbb.config.handler.OAuth2AuthenticationFailureHandler;
 import com.example.sbb.service.user.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -56,6 +57,7 @@ public class WebSecurityConfig {
                 .logoutSuccessUrl("/")
                 .and()  /* OAUTH */
                 .oauth2Login()
+                .failureHandler(oAuth2AuthenticationFailureHandler())
                 .userInfoEndpoint() // OAuth2 로그인 성공 후 가져올 설정들
                 .userService(customOAuth2UserService) // 서버에서 사용자 정보를 가져온 상태에서 추가로 진행하고자 하는 기능 명시
                 .and()
@@ -72,4 +74,11 @@ public class WebSecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    /*
+     * Oauth 인증 실패 핸들러
+     * */
+    @Bean
+    public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+        return new OAuth2AuthenticationFailureHandler();
+    }
 }

@@ -2,11 +2,10 @@ package com.example.sbb.dto;
 
 import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.entity.user.UserRole;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.example.sbb.repository.UserRepository;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
@@ -30,7 +29,7 @@ public class OAuthAttributes {
         if ("naver".equals(registrationId)) {
             return ofNaver("id", attributes, registrationId);
         }
-        if ("Kakao".equals(registrationId)) {
+        if ("kakao".equals(registrationId)) {
             return ofKakao("id", attributes, registrationId);
         }
         /* 구글인지 네이버인지 카카오인지 구분하기 위한 메소드 (ofNaver, ofKaKao) */
@@ -57,10 +56,13 @@ public class OAuthAttributes {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
 
+        log.info("kakao account : " + kakaoAccount);
+        log.info("kakao profile : " + kakaoProfile);
+
         return OAuthAttributes.builder()
                 .username((String) kakaoProfile.get("nickname"))
                 .email((String) kakaoAccount.get("email"))
-                .providerId((String) kakaoAccount.get("id"))
+                .providerId(String.valueOf(attributes.get("id")))
                 .provider(registrationId)
                 .attributes(attributes)
                 .nameAttributeKey(usernameAttributeName)

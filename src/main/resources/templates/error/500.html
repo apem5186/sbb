@@ -1,0 +1,16 @@
+<html layout:decorate="~{layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+  <div layout:fragment="content" class="container">
+    <h1>This is 500 Error Page!</h1>
+    500 Server Error...
+    <br>
+    <p th:text="${'path: ' + path}"></p>
+    <p th:text="${'status: ' + status}"></p>
+    <p th:text="${'timestamp: ' + timestamp}"></p>
+    <p th:text="${'error: ' + error}"></p>
+    <p th:text="${'errors: ' + errors}"></p>
+    <p th:text="${'exception: ' + exception}"></p>
+    <p th:text="${'message: ' + message}"></p>
+    <p th:text="${'trace: ' + trace}"></p>
+    <br>
+  </div>
+</html>
