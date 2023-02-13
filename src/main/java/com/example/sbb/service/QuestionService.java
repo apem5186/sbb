@@ -30,11 +30,6 @@ public class QuestionService {
         Pageable pageable = PageRequest.of(page-1, 10, Sort.by(sorts));
         Specification<Question> spec = search(kw);
         spec = spec.and(category(category));
-//        List<Question> questions = this.questionRepository.findAll(spec, pageable)
-//                .filter(q -> q.getCategory().toString().equals(category)).stream().toList();
-//        int start = (int) pageable.getOffset();
-//        int end = Math.min((start + pageable.getPageSize()), questions.size());
-//        Page<Question> questionList = new PageImpl<>(questions.subList(start, end), pageable, questions.size());
         return this.questionRepository.findAll(spec, pageable);
     }
 
