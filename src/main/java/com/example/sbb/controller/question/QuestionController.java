@@ -30,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.Collection;
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -46,8 +47,10 @@ public class QuestionController {
 
     @GetMapping("/list")
     public String list(Model model, @RequestParam(value = "page", defaultValue = "1") int page,
-                       @RequestParam(value = "kw", defaultValue = "") String kw) {
-        Page<Question> paging = this.questionService.getList(page, kw);
+                       @RequestParam(value = "kw", defaultValue = "") String kw,
+                       @RequestParam(value = "category", defaultValue = "free") String category) {
+        Page<Question> paging = this.questionService.getList(page, kw, category.toUpperCase());
+        model.addAttribute("category", category);
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
         return "question_list";

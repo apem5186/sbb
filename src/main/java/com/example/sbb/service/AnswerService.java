@@ -30,7 +30,7 @@ public class AnswerService {
 
     public Page<Answer> getList(int page, Integer id) {
         List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("regDate"));
+        sorts.add(Sort.Order.asc("regDate"));
         Pageable pageable = PageRequest.of(page-1, 5, Sort.by(sorts));
         Specification<Answer> spec = specAnswer(id);
         return this.answerRepository.findAll(spec, pageable);

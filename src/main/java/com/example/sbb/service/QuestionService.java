@@ -9,10 +9,8 @@ import com.example.sbb.repository.QuestionRepository;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -21,16 +19,22 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
-    // TODO : CATEGORY 별로 나타내게 해야함
-    public Page<Question> getList(int page, String kw) {
+    public Page<Question> getList(int page, String kw, String category) {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("regDate"));
         Pageable pageable = PageRequest.of(page-1, 10, Sort.by(sorts));
         Specification<Question> spec = search(kw);
+        spec = spec.and(category(category));
+//        List<Question> questions = this.questionRepository.findAll(spec, pageable)
+//                .filter(q -> q.getCategory().toString().equals(category)).stream().toList();
+//        int start = (int) pageable.getOffset();
+//        int end = Math.min((start + pageable.getPageSize()), questions.size());
+//        Page<Question> questionList = new PageImpl<>(questions.subList(start, end), pageable, questions.size());
         return this.questionRepository.findAll(spec, pageable);
     }
 
@@ -76,6 +80,15 @@ public class QuestionService {
         this.questionRepository.save(question);
     }
 
+    private Specification<Question> category(String category) {
+        return new Specification<Question>() {
+            @Override
+            public Predicate toPredicate(Root<Question> q, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return cb.equal(q.get("category"), Category.valueOf(category));
+            }
+        };
+    }
+
     private Specification<Question> search(String kw) {
         return new Specification<Question>() {
             private static final long serialVersionUID = 1L;
@@ -85,11 +98,12 @@ public class QuestionService {
                 Join<Question, SiteUser> u1 = q.join("author", JoinType.LEFT);
                 Join<Question, Answer> a = q.join("answerList", JoinType.LEFT);
                 Join<Answer, SiteUser> u2 = a.join("author", JoinType.LEFT);
+
                 return cb.or(cb.like(q.get("subject"), "%" + kw + "%"), // 제목
                         cb.like(q.get("content"), "%" + kw + "%"),   // 내용
                         cb.like(u1.get("username"), "%" + kw + "%"), // 질문 작성자
                         cb.like(a.get("content"), "%" + kw + "%"),   // 답변 내용
-                        cb.like(u2.get("username"), "%" + kw + "%"));  // 답변 작성자
+                        cb.like(u2.get("username"), "%" + kw + "%")); // 답변 작성자
             }
         };
     }

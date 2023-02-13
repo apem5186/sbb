@@ -1,11 +1,13 @@
 package com.example.sbb.controller.user;
 
+import com.example.sbb.dto.MailDTO;
 import com.example.sbb.dto.ProfileDTO;
 import com.example.sbb.dto.UserCreateForm;
 import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.repository.UserRepository;
 import com.example.sbb.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +30,14 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Controller
@@ -175,6 +180,42 @@ public class UserController {
     @GetMapping("/login")
     public String login() {
         return "login_form";
+    }
+
+    @GetMapping("/find/username")
+    public String findUsername() {
+        return "username_find_form";
+    }
+
+    @PostMapping("/find/username")
+    public String findUsername(String email, Model model) {
+        Optional<SiteUser> siteUser = userRepository.findByEmail(email);
+        if (siteUser.isPresent()) {
+            model.addAttribute("username", siteUser.get().getUsername());
+        } else {
+            model.addAttribute("username", "none");
+        }
+        return "username_find_form";
+    }
+
+    @GetMapping("/find/password")
+    public String findPassword() {
+        return "password_find_form";
+    }
+
+    @PostMapping("/find/password")
+    public String findPassword(String username, String email, Model model) {
+        if (userRepository.findByUsernameAndEmail(username, email).isEmpty()) {
+            model.addAttribute("noMatchUsernameAndEmail",
+                    "이메일 혹은 닉네임에 일치하는 사용자가 없습니다.");
+        } else {
+            MailDTO dto = userService.createMailAndChangePassword(email);
+            userService.mailSend(dto);
+            model.addAttribute("emailSendMsg",
+                    email + "로 이메일을 전송했습니다. 임시비밀번호로 로그인 후 비밀번호를 변경해 주세요.");
+        }
+
+        return "password_find_form";
     }
 
     @PreAuthorize("isAuthenticated()")

@@ -1,0 +1,21 @@
+<html layout:decorate="~{layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<div layout:fragment="content" class="container my-3">
+  <form th:action="@{/user/find/username}" method="post">
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="text" name="email" id="email" class="form-control" required>
+    </div>
+    <div class="alert alert-success" role="alert" th:if="${username} and ${username} != 'none'">
+      <div th:text="'username : ' + ${username}"></div>
+    </div>
+    <div class="alert alert-danger" role="alert" th:if="${username == 'none'}">
+      <div>일치하는 사용자가 없습니다.</div>
+    </div>
+    <hr class="my-2">
+    <button type="submit" class="btn btn-primary">아이디찾기</button>
+    <a th:href="@{/user/find/password}" class="btn btn-info" role="button">비밀번호 찾기</a>
+    <a th:href="@{/user/login}" class="btn btn-info" role="button">로그인</a>
+  </form>
+  <br>
+</div>
+</html>

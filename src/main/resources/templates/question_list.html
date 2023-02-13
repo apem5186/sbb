@@ -12,10 +12,13 @@
             </div>
         </div>
         <div class="d-flex">
-            <div class="btn-group-vertical" style="display: inline-block; margin-right: 15px" role="group">
-                <input type="radio" class="btn-check" name="cRadio" id="cRadio1" autocomplete="off">
+            <div class="btn-group-vertical" style="display: inline-block; margin-right: 15px" role="group"
+            id="cRadioGroup">
+                <input type="radio" class="btn-check" name="cRadio" id="cRadio1"
+                       value="cRadio1" autocomplete="off" checked>
                 <label class="btn btn-outline-dark fw-bold" for="cRadio1">자유게시판</label>
-                <input type="radio" class="btn-check" name="cRadio" id="cRadio2" autocomplete="off">
+                <input type="radio" class="btn-check" name="cRadio" id="cRadio2"
+                       value="cRadio2" autocomplete="off">
                 <label class="btn btn-outline-dark fw-bold" for="cRadio2">질문게시판</label>
             </div>
             <table class="table">
@@ -106,5 +109,30 @@
             document.getElementById('page').value = 1;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
             document.getElementById('searchForm').submit();
         });
+
+        const urlStr = window.location.href;
+        const url = new URL(urlStr);
+        const urlParams = url.searchParams;
+        const btn_free = document.getElementById("cRadio1");
+        const btn_ques = document.getElementById("cRadio2");
+        btn_free.addEventListener('click', function () {
+            if (urlParams.has("category")) {
+                urlParams.delete("category");
+            }
+            urlParams.append("category", "free");
+            window.open(location.pathname + '?' + urlParams, '_self');
+        });
+        btn_ques.addEventListener('click', function () {
+            if (urlParams.has("category")) {
+                urlParams.delete("category");
+            }
+            urlParams.append("category", "question");
+            window.open(location.pathname + '?' + urlParams, '_self');
+        })
+        if (urlParams.has("category") === null || urlParams.get("category") === 'free') {
+            $('#cRadioGroup input:radio[value=cRadio1]').attr('checked', true);
+        } else if(urlParams.get("category") === 'question') {
+            $('#cRadioGroup input:radio[value=cRadio2]').attr('checked', true);
+        }
     </script>
 </html>

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: oauth
+    include: oauth, mail
   devtools:
     livereload:
       enabled: true
