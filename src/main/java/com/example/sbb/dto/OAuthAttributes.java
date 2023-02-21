@@ -2,10 +2,8 @@ package com.example.sbb.dto;
 
 import com.example.sbb.entity.user.SiteUser;
 import com.example.sbb.entity.user.UserRole;
-import com.example.sbb.repository.UserRepository;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 

@@ -1,8 +1,6 @@
 package com.example.sbb.repository;
 
-import com.example.sbb.entity.board.Category;
 import com.example.sbb.entity.board.Question;
-import com.example.sbb.entity.user.SiteUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

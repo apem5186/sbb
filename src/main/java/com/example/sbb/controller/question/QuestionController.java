@@ -5,7 +5,6 @@ import com.example.sbb.dto.QuestionForm;
 import com.example.sbb.entity.board.Answer;
 import com.example.sbb.entity.board.Question;
 import com.example.sbb.entity.user.SiteUser;
-import com.example.sbb.entity.user.UserRole;
 import com.example.sbb.repository.QuestionRepository;
 import com.example.sbb.service.AnswerService;
 import com.example.sbb.service.QuestionService;
@@ -30,7 +29,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.Collection;
-import java.util.List;
 
 @Controller
 @Slf4j
@@ -38,7 +36,6 @@ import java.util.List;
 @RequestMapping("/question")
 public class QuestionController {
 
-    private final QuestionRepository questionRepository;
     private final QuestionService questionService;
     private final AnswerService answerService;
     private final UserService userService;

@@ -1,6 +1,5 @@
 package com.example.sbb.service;
 
-import com.example.sbb.dto.AnswerForm;
 import com.example.sbb.entity.board.Answer;
 import com.example.sbb.entity.board.Question;
 import com.example.sbb.entity.user.SiteUser;

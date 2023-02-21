@@ -1,6 +1,5 @@
 package com.example.sbb.dto;
 
-import com.example.sbb.entity.board.Category;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;

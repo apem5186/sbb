@@ -1,8 +1,6 @@
 package com.example.sbb.repository;
 
 import com.example.sbb.entity.board.Answer;
-import com.example.sbb.entity.user.SiteUser;
-import org.hibernate.annotations.NamedNativeQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

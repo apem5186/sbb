@@ -1,11 +1,7 @@
 package com.example.sbb.dto;
 
-import com.example.sbb.entity.board.Answer;
-import com.example.sbb.entity.board.Question;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
